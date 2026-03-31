@@ -60,11 +60,17 @@
             opacity: 0.9;
         }
 
-        #result {
+        #result, #endTimeResult {
             margin-top: 24px;
             text-align: center;
             font-size: 24px;
             font-weight: bold;
+            line-height: 1.5;
+        }
+
+        #endTimeResult {
+            margin-top: 12px;
+            font-size: 22px;
         }
     </style>
 </head>
@@ -76,20 +82,28 @@
         <input type="number" id="length" autofocus>
 
         <label for="speed">速度 (m/分)</label>
-        <input type="number" id="speed" onkeypress="if(event.key==='Enter') calc()">
+        <input type="number" id="speed">
+
+        <label for="startTime">開始時刻（任意）</label>
+        <input type="time" id="startTime" onkeypress="if(event.key==='Enter') calc()">
 
         <button onclick="calc()">計算</button>
 
         <div id="result"></div>
+        <div id="endTimeResult"></div>
     </div>
 
     <script>
         function calc() {
             let length = document.getElementById("length").value;
             let speed = document.getElementById("speed").value;
+            let startTime = document.getElementById("startTime").value;
+
+            const resultEl = document.getElementById("result");
+            const endTimeEl = document.getElementById("endTimeResult");
 
             if (!length || !speed) {
-                alert("数値を入力してください");
+                alert("残量と速度を入力してください");
                 return;
             }
 
@@ -101,10 +115,34 @@
                 return;
             }
 
-            let time = Math.floor(length / speed);
+            let totalMin = Math.floor(length / speed);
+            let hour = Math.floor(totalMin / 60);
+            let min = totalMin % 60;
 
-            document.getElementById("result").innerText =
-                "残り時間：約 " + time + " 分";
+            resultEl.innerText =
+                "残り時間：約 " + totalMin + "分（" + hour + "時間" + min + "分）";
+
+            // 開始時刻が未入力なら終了予定時刻は表示しない
+            if (!startTime) {
+                endTimeEl.innerText = "";
+                return;
+            }
+
+            let timeParts = startTime.split(":");
+            let startHour = Number(timeParts[0]);
+            let startMin = Number(timeParts[1]);
+
+            let startTotalMin = startHour * 60 + startMin;
+            let endTotalMin = startTotalMin + totalMin;
+
+            let endHour = Math.floor((endTotalMin % (24 * 60)) / 60);
+            let endMin = endTotalMin % 60;
+
+            let endHourStr = String(endHour).padStart(2, "0");
+            let endMinStr = String(endMin).padStart(2, "0");
+
+            endTimeEl.innerText =
+                "終了予定時刻：" + endHourStr + ":" + endMinStr;
         }
     </script>
 </body>
