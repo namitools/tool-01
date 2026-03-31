@@ -103,7 +103,7 @@
             const endTimeEl = document.getElementById("endTimeResult");
 
             if (!length || !speed) {
-                alert("残量と速度を入力してください");
+                alert("長さと速度を入力してください");
                 return;
             }
 
@@ -119,8 +119,8 @@
             let hour = Math.floor(totalMin / 60);
             let min = totalMin % 60;
 
-            resultEl.innerText =
-                "残り時間：約 " + totalMin + "分（" + hour + "時間" + min + "分）";
+            resultEl.innerHTML =
+                "残り時間：約 " + totalMin + "分<br>（" + hour + "時間" + min + "分）";
 
             // 開始時刻が未入力なら終了予定時刻は表示しない
             if (!startTime) {
