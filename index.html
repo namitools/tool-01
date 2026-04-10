@@ -1,149 +1,366 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>コーティング残り時間計算</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            padding: 20px;
-            margin: 0;
-            background-color: #f5f5f5;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>コーティング計算アプリ</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 20px;
+      background: #f7f7f7;
+      color: #222;
+    }
 
-        .container {
-            max-width: 400px;
-            margin: 30px auto;
-            background: #ffffff;
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-        }
+    .container {
+      max-width: 520px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
 
-        h2 {
-            margin-top: 0;
-            margin-bottom: 20px;
-            text-align: center;
-        }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
 
-        label {
-            display: block;
-            margin-top: 14px;
-            margin-bottom: 6px;
-            font-weight: bold;
-        }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
 
-        input {
-            width: 100%;
-            box-sizing: border-box;
-            font-size: 18px;
-            padding: 12px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-        }
+    .tab-button {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background: #ddd;
+      cursor: pointer;
+      font-size: 15px;
+    }
 
-        button {
-            width: 100%;
-            margin-top: 20px;
-            font-size: 18px;
-            font-weight: bold;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            background-color: #333;
-            color: white;
-            cursor: pointer;
-        }
+    .tab-button.active {
+      background: #333;
+      color: #fff;
+      font-weight: bold;
+    }
 
-        button:hover {
-            opacity: 0.9;
-        }
+    .tab-content {
+      display: none;
+    }
 
-        #result, #endTimeResult {
-            margin-top: 24px;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            line-height: 1.5;
-        }
+    .tab-content.active {
+      display: block;
+    }
 
-        #endTimeResult {
-            margin-top: 12px;
-            font-size: 22px;
-        }
-    </style>
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      box-sizing: border-box;
+      border: 1px solid #bbb;
+      border-radius: 8px;
+    }
+
+    .time-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .input-switch {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .mode-button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #ddd;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .mode-button.active {
+      background: #555;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .time-input-area {
+      display: none;
+    }
+
+    .time-input-area.active {
+      display: block;
+    }
+
+    button.calc-button {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border: none;
+      border-radius: 10px;
+      background: #333;
+      color: #fff;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 14px;
+      background: #f0f0f0;
+      border-radius: 10px;
+      font-size: 22px;
+      font-weight: bold;
+      white-space: pre-line;
+      text-align: center;
+    }
+
+    .sub-result {
+      margin-top: 10px;
+      font-size: 14px;
+      color: #555;
+      text-align: center;
+      white-space: pre-line;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h2>コーティング残り時間計算</h2>
+  <div class="container">
+    <h1>コーティング計算アプリ</h1>
 
-        <label for="length">長さ (m)</label>
-        <input type="number" id="length" autofocus>
-
-        <label for="speed">速度 (m/min)</label>
-        <input type="number" id="speed">
-
-        <label for="startTime">開始時刻（任意）</label>
-        <input type="time" id="startTime" onkeypress="if(event.key==='Enter') calc()">
-
-        <button onclick="calc()">計算</button>
-
-        <div id="result"></div>
-        <div id="endTimeResult"></div>
+    <div class="tabs">
+      <button class="tab-button active" onclick="switchTab('timeTab', this)">
+        長さ → 時間
+      </button>
+      <button class="tab-button" onclick="switchTab('lengthTab', this)">
+        時間 → 長さ
+      </button>
     </div>
 
-    <script>
-        function calc() {
-            let length = document.getElementById("length").value;
-            let speed = document.getElementById("speed").value;
-            let startTime = document.getElementById("startTime").value;
+    <!-- 長さ → 時間 -->
+    <div id="timeTab" class="tab-content active">
+      <div class="form-group">
+        <label for="speedTime">速度（m/分）</label>
+        <input type="number" id="speedTime" min="0.01" step="0.01" placeholder="例：22">
+      </div>
 
-            const resultEl = document.getElementById("result");
-            const endTimeEl = document.getElementById("endTimeResult");
+      <div class="form-group">
+        <label for="lengthInput">長さ（m）</label>
+        <input type="number" id="lengthInput" min="1" placeholder="例：5200">
+      </div>
 
-            if (!length || !speed) {
-                alert("長さと速度を入力してください");
-                return;
-            }
+      <div class="form-group">
+        <label for="startTimeInput">開始時刻（任意）</label>
+        <input type="time" id="startTimeInput">
+      </div>
 
-            length = Number(length);
-            speed = Number(speed);
+      <button class="calc-button" onclick="calcTimeFromLength()">時間を計算</button>
 
-            if (speed <= 0) {
-                alert("速度は0より大きい数値を入力してください");
-                return;
-            }
+      <div id="timeResult" class="result"></div>
+      <div id="endTimeResult" class="sub-result"></div>
+    </div>
 
-            let totalMin = Math.floor(length / speed);
-            let hour = Math.floor(totalMin / 60);
-            let min = totalMin % 60;
+    <!-- 時間 → 長さ -->
+    <div id="lengthTab" class="tab-content">
+      <div class="form-group">
+        <label for="speedLength">速度（m/分）</label>
+        <input type="number" id="speedLength" min="0.01" step="0.01" placeholder="例：22">
+      </div>
 
-            resultEl.innerHTML =
-                "残り時間：約 " + totalMin + "分<br>（" + hour + "時間" + min + "分）";
+      <div class="form-group">
+        <label>時間入力</label>
 
-            // 開始時刻が未入力なら終了予定時刻は表示しない
-            if (!startTime) {
-                endTimeEl.innerText = "";
-                return;
-            }
+        <div class="input-switch">
+          <button type="button" class="mode-button active" id="modeHmButton" onclick="switchTimeInputMode('hm')">
+            時間・分で入力
+          </button>
+          <button type="button" class="mode-button" id="modeTotalButton" onclick="switchTimeInputMode('total')">
+            合計分で入力
+          </button>
+        </div>
 
-            let timeParts = startTime.split(":");
-            let startHour = Number(timeParts[0]);
-            let startMin = Number(timeParts[1]);
+        <div id="hmInputArea" class="time-input-area active">
+          <div class="time-grid">
+            <input type="number" id="hoursInput" min="0" placeholder="時間">
+            <input type="number" id="minutesInput" min="0" max="59" placeholder="分">
+          </div>
+        </div>
 
-            let startTotalMin = startHour * 60 + startMin;
-            let endTotalMin = startTotalMin + totalMin;
+        <div id="totalInputArea" class="time-input-area">
+          <input type="number" id="totalMinutesInput" min="1" placeholder="例：156">
+        </div>
+      </div>
 
-            let endHour = Math.floor((endTotalMin % (24 * 60)) / 60);
-            let endMin = endTotalMin % 60;
+      <button class="calc-button" onclick="calcLengthFromTime()">長さを計算</button>
 
-            let endHourStr = String(endHour).padStart(2, "0");
-            let endMinStr = String(endMin).padStart(2, "0");
+      <div id="lengthResult" class="result"></div>
+      <div id="lengthSubResult" class="sub-result"></div>
+    </div>
+  </div>
 
-            endTimeEl.innerText =
-                "終了予定時刻：" + endHourStr + ":" + endMinStr;
+  <script>
+    let timeInputMode = "hm";
+
+    function switchTab(tabId, clickedButton) {
+      const tabs = document.querySelectorAll(".tab-content");
+      const buttons = document.querySelectorAll(".tab-button");
+
+      tabs.forEach(tab => tab.classList.remove("active"));
+      buttons.forEach(button => button.classList.remove("active"));
+
+      document.getElementById(tabId).classList.add("active");
+      clickedButton.classList.add("active");
+    }
+
+    function switchTimeInputMode(mode) {
+      timeInputMode = mode;
+
+      const hmButton = document.getElementById("modeHmButton");
+      const totalButton = document.getElementById("modeTotalButton");
+      const hmArea = document.getElementById("hmInputArea");
+      const totalArea = document.getElementById("totalInputArea");
+
+      hmButton.classList.remove("active");
+      totalButton.classList.remove("active");
+      hmArea.classList.remove("active");
+      totalArea.classList.remove("active");
+
+      if (mode === "hm") {
+        hmButton.classList.add("active");
+        hmArea.classList.add("active");
+      } else {
+        totalButton.classList.add("active");
+        totalArea.classList.add("active");
+      }
+    }
+
+    function formatHoursMinutes(totalMinutes) {
+      const hours = Math.floor(totalMinutes / 60);
+      const minutes = totalMinutes % 60;
+      return `${hours}時間${minutes}分`;
+    }
+
+    function calcTimeFromLength() {
+      const speed = Number(document.getElementById("speedTime").value);
+      const length = Number(document.getElementById("lengthInput").value);
+      const startTime = document.getElementById("startTimeInput").value;
+      const resultEl = document.getElementById("timeResult");
+      const endTimeEl = document.getElementById("endTimeResult");
+
+      resultEl.innerText = "";
+      endTimeEl.innerText = "";
+
+      if (!speed || speed <= 0) {
+        resultEl.innerText = "速度（m/分）を入力してください";
+        return;
+      }
+
+      if (!length || length <= 0) {
+        resultEl.innerText = "長さを入力してください";
+        return;
+      }
+
+      const rawMinutes = length / speed;
+      const totalMinutes = Math.ceil(rawMinutes);
+
+      resultEl.innerText = `約 ${totalMinutes}分\n（${formatHoursMinutes(totalMinutes)}）`;
+
+      if (startTime) {
+        const [hour, minute] = startTime.split(":").map(Number);
+        const start = new Date();
+        start.setHours(hour, minute, 0, 0);
+
+        const end = new Date(start.getTime() + totalMinutes * 60000);
+
+        const endHour = String(end.getHours()).padStart(2, "0");
+        const endMinute = String(end.getMinutes()).padStart(2, "0");
+
+        endTimeEl.innerText = `終了予定時刻：${endHour}:${endMinute}`;
+      }
+    }
+
+    function getInputTotalMinutes() {
+      if (timeInputMode === "total") {
+        const totalMinutes = Number(document.getElementById("totalMinutesInput").value);
+        if (totalMinutes > 0) {
+          return totalMinutes;
         }
-    </script>
+        return null;
+      }
+
+      const hoursInput = Number(document.getElementById("hoursInput").value) || 0;
+      const minutesInput = Number(document.getElementById("minutesInput").value) || 0;
+      const total = (hoursInput * 60) + minutesInput;
+
+      if (total > 0) {
+        return total;
+      }
+
+      return null;
+    }
+
+    function calcLengthFromTime() {
+      const speed = Number(document.getElementById("speedLength").value);
+      const totalMinutes = getInputTotalMinutes();
+      const resultEl = document.getElementById("lengthResult");
+      const subResultEl = document.getElementById("lengthSubResult");
+
+      resultEl.innerText = "";
+      subResultEl.innerText = "";
+
+      if (!speed || speed <= 0) {
+        resultEl.innerText = "速度（m/分）を入力してください";
+        return;
+      }
+
+      if (totalMinutes === null) {
+        resultEl.innerText = "時間を入力してください";
+        return;
+      }
+
+      const length = totalMinutes * speed;
+      
+      resultEl.innerText = `約 ${length.toLocaleString()}m`;
+
+
+    }
+
+    document.addEventListener("keydown", function(event) {
+      if (event.key !== "Enter") return;
+
+      const activeElement = document.activeElement;
+      const tagName = activeElement.tagName.toLowerCase();
+
+      if (tagName !== "input") return;
+
+      event.preventDefault();
+
+      if (document.getElementById("timeTab").classList.contains("active")) {
+        calcTimeFromLength();
+      } else if (document.getElementById("lengthTab").classList.contains("active")) {
+        calcLengthFromTime();
+      }
+    });
+  </script>
 </body>
 </html>
